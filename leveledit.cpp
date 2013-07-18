@@ -1,6 +1,7 @@
 //The headers
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -42,6 +43,12 @@ const int TILE_AIR = 3;
 //The surfaces
 SDL_Surface *screen = NULL;
 SDL_Surface *tileSheet = NULL;
+
+//The font used
+TTF_Font *font = NULL;
+
+//The text displayed in the corner
+std::string text = "";
 
 //Sprite from the tile sheet
 SDL_Rect clips[ TILE_SPRITES ];
@@ -216,8 +223,10 @@ bool init()
         return false;
     }
 
+    TTF_Init();
+
     //Set the window caption
-    SDL_WM_SetCaption( "Level Editor. Current Tile: Floor", NULL );
+    text = "Current Tile: Floor";
 
     //If everything initialized fine
     std::cout << "Initialisation completed.\n";
@@ -229,12 +238,22 @@ bool load_files()
     std::cout << "Loading files.\n";
     //Load the tile sheet
     tileSheet = load_image( "tiles.png" );
+    //Load the font
+    font = TTF_OpenFont("FreeSans.ttf", 24);
 
     //If there was a problem in loading the tiles
     if( tileSheet == NULL )
     {
         return false;
     }
+    std::cout << "Loaded images.\n";
+
+    //If the font was not loaded
+    if( font == NULL)
+    {
+        return false;
+    }
+    std::cout << "Loaded fonts.\n";
     //If everything loaded fine
     std::cout << "Loaded files.\n";
     return true;
@@ -258,35 +277,35 @@ void show_type( int tileType )
     switch( tileType )
     {
     case TILE_FLOOR:
-        SDL_WM_SetCaption( "Level Editor. Current Tile: Floor", NULL );
+        text = "Current Tile: Floor";
         break;
 
     case TILE_RED:
-        SDL_WM_SetCaption( "Level Editor. Current Tile: Red", NULL );
+        text = "Current Tile: Red";
         break;
 
     case TILE_WALL:
-        SDL_WM_SetCaption( "Level Editor. Current Tile: Wall", NULL );
+        text = "Current Tile: Wall";
         break;
 
     case TILE_RAMP_TOP:
-        SDL_WM_SetCaption( "Level Editor. Current Tile: Top-facing ramp", NULL );
+        text = "Current Tile: Top-facing ramp";
         break;
 
     case TILE_RAMP_RIGHT:
-        SDL_WM_SetCaption( "Level Editor. Current Tile: Right-facing ramp", NULL );
+        text = "Current Tile: Right-facing ramp";
         break;
 
     case TILE_RAMP_BOTTOM:
-        SDL_WM_SetCaption( "Level Editor. Current Tile: Bottom-facing ramp", NULL );
+        text = "Current Tile: Bottom-facing ramp";
         break;
 
     case TILE_RAMP_LEFT:
-        SDL_WM_SetCaption( "Level Editor. Current Tile: Left-facing ramp", NULL );
+        text = "Current Tile: Left-facing ramp";
         break;
 
     case TILE_AIR:
-        SDL_WM_SetCaption( "Level Editor. Current Tile: Empty", NULL );
+        text = "Current Tile: Empty";
         break;
 
     default:
@@ -721,6 +740,11 @@ int main( int argc, char* args[] )
             tiles[ t ]->show();
         }
 
+        //Show the text
+        SDL_Color textcol = {0,0,0};
+        SDL_Surface *textsurf = TTF_RenderText_Solid(font, text.c_str(), textcol);
+        apply_surface(0,0, textsurf, screen);
+
         //Update the screen
         if( SDL_Flip( screen ) == -1 )
         {
@@ -735,6 +759,7 @@ int main( int argc, char* args[] )
     }
 
     SDL_Quit();
+    TTF_Quit();
 
     std::string savefilename;
 
