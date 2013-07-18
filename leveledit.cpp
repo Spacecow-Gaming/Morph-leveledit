@@ -200,6 +200,7 @@ bool check_collision( SDL_Rect &A, SDL_Rect &B )
 
 bool init()
 {
+    std::cout << "Initialising editor.\n";
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
     {
@@ -219,11 +220,13 @@ bool init()
     SDL_WM_SetCaption( "Level Editor. Current Tile: Floor", NULL );
 
     //If everything initialized fine
+    std::cout << "Initialisation completed.\n";
     return true;
 }
 
 bool load_files()
 {
+    std::cout << "Loading files.\n";
     //Load the tile sheet
     tileSheet = load_image( "tiles.png" );
 
@@ -233,11 +236,13 @@ bool load_files()
         return false;
     }
     //If everything loaded fine
+    std::cout << "Loaded files.\n";
     return true;
 }
 
 void clean_up( Tile *tiles[] )
 {
+    std::cout << "Cleaning up resources and quitting.\n";
     //Free the surface
     SDL_FreeSurface( tileSheet );
 
