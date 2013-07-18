@@ -1,4 +1,4 @@
-CC=clang
+CC=g++
 CFLAGS=-I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 LDFLAGS=-L/usr/lib -lSDL -lpthread -lSDL_image -lstdc++
 SOURCES=leveledit.cpp
