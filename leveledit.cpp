@@ -62,57 +62,57 @@ SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 //The tile
 class Tile
 {
-private:
-    //The attributes of the tile
-    SDL_Rect box;
+    private:
+        //The attributes of the tile
+        SDL_Rect box;
 
-    //The tile type
-    int type;
+        //The tile type
+        int type;
 
-public:
-    //Initializes the variables
-    Tile( int x, int y, int tileType );
+    public:
+        //Initializes the variables
+        Tile( int x, int y, int tileType );
 
-    //Shows the tile
-    void show();
+        //Shows the tile
+        void show();
 
-    //Get the tile type
-    int get_type();
+        //Get the tile type
+        int get_type();
 
-    //Get the collision box
-    SDL_Rect &get_box();
+        //Get the collision box
+        SDL_Rect &get_box();
 };
 
 //The timer
 class Timer
 {
-private:
-    //The clock time when the timer started
-    int startTicks;
+    private:
+        //The clock time when the timer started
+        int startTicks;
 
-    //The ticks stored when the timer was paused
-    int pausedTicks;
+        //The ticks stored when the timer was paused
+        int pausedTicks;
 
-    //The timer status
-    bool paused;
-    bool started;
+        //The timer status
+        bool paused;
+        bool started;
 
-public:
-    //Initializes variables
-    Timer();
+    public:
+        //Initializes variables
+        Timer();
 
-    //The various clock actions
-    void start();
-    void stop();
-    void pause();
-    void unpause();
+        //The various clock actions
+        void start();
+        void stop();
+        void pause();
+        void unpause();
 
-    //Gets the timer's time
-    int get_ticks();
+        //Gets the timer's time
+        int get_ticks();
 
-    //Checks the status of the timer
-    bool is_started();
-    bool is_paused();
+        //Checks the status of the timer
+        bool is_started();
+        bool is_paused();
 };
 
 SDL_Surface *load_image( std::string filename )
@@ -276,40 +276,40 @@ void show_type( int tileType )
 {
     switch( tileType )
     {
-    case TILE_FLOOR:
-        text = "Current Tile: Floor";
-        break;
+        case TILE_FLOOR:
+            text = "Current Tile: Floor";
+            break;
 
-    case TILE_RED:
-        text = "Current Tile: Red";
-        break;
+        case TILE_RED:
+            text = "Current Tile: Red";
+            break;
 
-    case TILE_WALL:
-        text = "Current Tile: Wall";
-        break;
+        case TILE_WALL:
+            text = "Current Tile: Wall";
+            break;
 
-    case TILE_RAMP_TOP:
-        text = "Current Tile: Top-facing ramp";
-        break;
+        case TILE_RAMP_TOP:
+            text = "Current Tile: Top-facing ramp";
+            break;
 
-    case TILE_RAMP_RIGHT:
-        text = "Current Tile: Right-facing ramp";
-        break;
+        case TILE_RAMP_RIGHT:
+            text = "Current Tile: Right-facing ramp";
+            break;
 
-    case TILE_RAMP_BOTTOM:
-        text = "Current Tile: Bottom-facing ramp";
-        break;
+        case TILE_RAMP_BOTTOM:
+            text = "Current Tile: Bottom-facing ramp";
+            break;
 
-    case TILE_RAMP_LEFT:
-        text = "Current Tile: Left-facing ramp";
-        break;
+        case TILE_RAMP_LEFT:
+            text = "Current Tile: Left-facing ramp";
+            break;
 
-    case TILE_AIR:
-        text = "Current Tile: Empty";
-        break;
+        case TILE_AIR:
+            text = "Current Tile: Empty";
+            break;
 
-    default:
-        break;
+        default:
+            break;
 
     };
 }
@@ -447,31 +447,87 @@ void clip_tiles()
 
 }
 
-bool set_tiles( Tile *tiles[])
+bool set_tiles( Tile *tiles[], std::string mapfile)
 {
     //The tile offsets
     int x = 0, y = 0;
 
+    //Open the map
+    std::ifstream map(mapfile.c_str());
 
-    //Initialize the tiles
-    for( int t = 0; t < TOTAL_TILES; t++ )
+    if (map == NULL)
     {
-        //Put a floor tile
-        tiles[ t ] = new Tile( x, y, TILE_AIR);
-
-        //Move to next tile spot
-        x += TILE_WIDTH;
-
-        //If we've gone too far
-        if( x >= LEVEL_WIDTH )
+        //If there is no valid mapfile, initialize the tiles
+        for( int t = 0; t < TOTAL_TILES; t++ )
         {
-            //Move back
-            x = 0;
+            //Put a floor tile
+            tiles[ t ] = new Tile( x, y, TILE_AIR);
 
-            //Move to the next row
-            y += TILE_HEIGHT;
+            //Move to next tile spot
+            x += TILE_WIDTH;
+
+            //If we've gone too far
+            if( x >= LEVEL_WIDTH )
+            {
+                //Move back
+                x = 0;
+
+                //Move to the next row
+                y += TILE_HEIGHT;
+            }
+        }
+
+    }
+    else
+    {
+        //Initialize the tiles
+        for( int t = 0; t < TOTAL_TILES; t++ )
+        {
+            //Determines what kind of tile will be made
+            int tileType = -1;
+
+            //Read tile from map file
+            map >> tileType;
+
+            //If there was a problem in reading the map
+            if( map.fail() == true )
+            {
+                //Stop loading map
+                map.close();
+                return false;
+            }
+
+            //If the number is a valid tile number
+            if( ( tileType >= 0 ) && ( tileType < TILE_SPRITES ) )
+            {
+                tiles[ t ] = new Tile( x, y, tileType );
+            }
+            //If we don't recognize the tile type
+            else
+            {
+                //Stop loading map
+                map.close();
+                return false;
+            }
+
+            //Move to next tile spot
+            x += TILE_WIDTH;
+
+            //If we've gone too far
+            if( x >= LEVEL_WIDTH )
+            {
+                //Move back
+                x = 0;
+
+                //Move to the next row
+                y += TILE_HEIGHT;
+            }
+
         }
     }
+
+
+
 
 
 
@@ -649,13 +705,13 @@ int main( int argc, char* args[] )
     //Clip the tile sheet
     clip_tiles();
 
-    //std::string openfilename;
+    std::string openfilename;
 
-    // std::cout << "Enter filename to open:";
-    // std::cin >> openfilename;
+    std::cout << "Enter filename to open:";
+    std::cin >> openfilename;
 
     //Set the tiles
-    if( set_tiles( tiles) == false )
+    if( set_tiles( tiles, openfilename) == false )
     {
         return 1;
     }
@@ -675,40 +731,40 @@ int main( int argc, char* args[] )
                 //Changes tile type based on number key pressed
                 switch(event.key.keysym.sym)
                 {
-                case SDLK_1:
-                    currentType = TILE_FLOOR;
-                    break;
+                    case SDLK_1:
+                        currentType = TILE_FLOOR;
+                        break;
 
-                case SDLK_2:
-                    currentType = TILE_RED;
-                    break;
+                    case SDLK_2:
+                        currentType = TILE_RED;
+                        break;
 
-                case SDLK_3:
-                    currentType = TILE_WALL;
-                    break;
+                    case SDLK_3:
+                        currentType = TILE_WALL;
+                        break;
 
-                case SDLK_4:
-                    currentType = TILE_RAMP_BOTTOM;
-                    break;
+                    case SDLK_4:
+                        currentType = TILE_RAMP_BOTTOM;
+                        break;
 
-                case SDLK_5:
-                    currentType = TILE_RAMP_RIGHT;
-                    break;
+                    case SDLK_5:
+                        currentType = TILE_RAMP_RIGHT;
+                        break;
 
-                case SDLK_6:
-                    currentType = TILE_RAMP_TOP;
-                    break;
+                    case SDLK_6:
+                        currentType = TILE_RAMP_TOP;
+                        break;
 
-                case SDLK_7:
-                    currentType = TILE_RAMP_LEFT;
-                    break;
+                    case SDLK_7:
+                        currentType = TILE_RAMP_LEFT;
+                        break;
 
-                case SDLK_0:
-                    currentType = TILE_AIR;
-                    break;
+                    case SDLK_0:
+                        currentType = TILE_AIR;
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
                 }
                 show_type( currentType );
             }
