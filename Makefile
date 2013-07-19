@@ -1,12 +1,13 @@
 CC=g++
 CFLAGS=-I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 LDFLAGS=-L/usr/lib -lSDL -lpthread -lSDL_image -lSDL_ttf -lstdc++
-SOURCES=leveledit.cpp
+SOURCES=src/leveledit.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
 
 all: leveledit
 
 leveledit:
-	$(CC) $(CFLAGS) $(SOURCES) -o bin/leveledit $(LDFLAGS)
+	$(CC) $(CFLAGS) $(SOURCES) -o leveledit $(LDFLAGS)
 
 clean:
-	rm -rf *o bin/leveledit
+	rm -rf $(OBJECTS) leveledit

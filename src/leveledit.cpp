@@ -237,9 +237,9 @@ bool load_files()
 {
     std::cout << "Loading files.\n";
     //Load the tile sheet
-    tileSheet = load_image( "tiles.png" );
+    tileSheet = load_image( "media/tiles.png" );
     //Load the font
-    font = TTF_OpenFont("FreeSans.ttf", 24);
+    font = TTF_OpenFont("media/FreeSans.ttf", 24);
 
     //If there was a problem in loading the tiles
     if( tileSheet == NULL )
